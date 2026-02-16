@@ -1,0 +1,26 @@
+FROM node:18-slim
+
+# Install Chromium dependencies for Puppeteer
+RUN apt-get update && apt-get install -y \
+    chromium \
+    fonts-freefont-ttf \
+    fonts-noto-color-emoji \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
+
+# Tell Puppeteer to use installed Chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json ./
+RUN npm install --production
+
+# Copy app files
+COPY . .
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]
